@@ -41,6 +41,15 @@ class MyGame(arcade.Window):
         # A Camera that can be used for scrolling the screen
         self.camera = None
 
+        # A Camera that can be used to draw GUI elements
+        self.gui_camera = None
+
+        # Keep track of the score
+        self.score = 0
+        
+        #coins to be collected
+        self.coins_to_be_collected = 0 
+
         # Load sounds
         self.collect_coin_sound = arcade.load_sound(":resources:sounds/coin1.wav")
         self.jump_sound = arcade.load_sound(":resources:sounds/jump1.wav")
@@ -50,8 +59,14 @@ class MyGame(arcade.Window):
     def setup(self):
         """Set up the game here. Call this function to restart the game."""
 
-        # Set up the Camera
+        # Set up the Game Camera
         self.camera = arcade.Camera(self.width, self.height)
+
+        # Set up the GUI Camera
+        self.gui_camera = arcade.Camera(self.width, self.height)
+
+        # Keep track of the score
+        self.score = 0
 
         # Initialize Scene
         self.scene = arcade.Scene()
@@ -60,7 +75,7 @@ class MyGame(arcade.Window):
         image_source = ":resources:images/animated_characters/female_adventurer/femaleAdventurer_idle.png"
         self.player_sprite = arcade.Sprite(image_source, CHARACTER_SCALING)
         self.player_sprite.center_x = 64
-        self.player_sprite.center_y = 128
+        self.player_sprite.center_y = 96
         self.scene.add_sprite("Player", self.player_sprite)
 
         # Create the ground
@@ -89,6 +104,8 @@ class MyGame(arcade.Window):
             coin.center_x = x
             coin.center_y = 96
             self.scene.add_sprite("Coins", coin)
+        # sets cois to be colected
+        self.coins_to_be_collected = len(self.scene["Coins"])
 
         # Create the 'physics engine'
         self.physics_engine = arcade.PhysicsEnginePlatformer(
@@ -101,11 +118,28 @@ class MyGame(arcade.Window):
         # Clear the screen to the background color
         self.clear()
 
-        # Activate our Camera
+        # Activate the game camera
         self.camera.use()
 
         # Draw our Scene
         self.scene.draw()
+
+        # Activate the GUI camera before drawing GUI elements
+        self.gui_camera.use()
+
+        # Draw our score on the screen, scrolling it with the viewport
+        score_text = f"Score: {self.score}"
+        arcade.draw_text(
+            score_text,
+            10,
+            10,
+            arcade.csscolor.WHITE,
+            18,
+            )
+        left_txt = f"Coins left: {self.coins_to_be_collected}"
+        arcade.draw_text(left_txt,100,10,arcade.csscolor.WHITE,18)
+        
+        
 
     def on_key_press(self, key, modifiers):
         """Called whenever a key is pressed."""
@@ -157,6 +191,9 @@ class MyGame(arcade.Window):
             coin.remove_from_sprite_lists()
             # Play a sound
             arcade.play_sound(self.collect_coin_sound)
+            # Add one to the score
+            self.score += 1
+        self.coins_to_be_collected = len(self.scene["Coins"])
 
         # Position the camera
         self.center_camera_to_player()

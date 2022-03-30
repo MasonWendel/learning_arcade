@@ -1,3 +1,6 @@
+<<<<<<< HEAD
+import arcade 
+=======
 """
 Platformer Game
 """
@@ -153,3 +156,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+>>>>>>> 6dfd74f44e48f883cd976ee41b444038b47ce32a
